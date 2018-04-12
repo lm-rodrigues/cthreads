@@ -1,17 +1,21 @@
 #include "../include/cthread.h"
 
-int cidentify (char *name, int size)
-{
-	char nomes[] = "Arthur L. Fuchs, 00261577 \nGabriel Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
-	int i = 0;
-	while (i < size)
-	{
-		name[i] = nomes[i];
-		if (nomes[i]=='\0')
-		{
-			break;
-		}
-		i++;
-	}
-	return 0;
+#define GROUP_NAMES_SIZE 92
+
+int cidentify (char *name, int size) {
+  char group_names[] = "Arthur L. Fuchs, 00261577 \nGabriel Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
+  int i = 0;
+
+  if ( size < GROUP_NAMES_SIZE ) {
+    return -1;
+  }
+  else {
+    while (i < size && group_names[i] != '\0') {
+      name[i] = group_names[i];
+      i++;
+    }
+
+    name[i] = '\0';
+    return 0;
+  }
 }
