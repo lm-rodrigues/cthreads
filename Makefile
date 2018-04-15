@@ -34,4 +34,4 @@ $(BIN_DIR)cthread.o: $(SRC_DIR)cthread.c
 # New link of support.o because it's removed in clean up process
 clean:
 	rm -rf $(BIN_DIR)*.o $(SRC_DIR)*~ $(INC_DIR)*~ $(LIB_DIR)*.a *~ && \
-	ln -s ./resources/support.o $(BIN_DIR)support.o
+	ln -s ../resources/support.o $(BIN_DIR)support.o
