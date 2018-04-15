@@ -14,7 +14,7 @@ Os estados de transição possíveis para cada thread são os seguintes:
 
 As funcionalidades implementadas na api são:
 
-- [ ] ccreate (WIP);
+- [x] ccreate;
 - [ ] cyield;
 - [ ] cjoin;
 - [ ] csuspend;
