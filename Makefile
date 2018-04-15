@@ -11,23 +11,27 @@
 # 
 
 CC=gcc
-LIB_DIR=./lib
-INC_DIR=./include
-BIN_DIR=./bin
-SRC_DIR=./src
+CFLAGS=-Wall -g
+LIB_MAKER=ar rcs
+LIB_DIR=./lib/
+INC_DIR=./include/
+BIN_DIR=./bin/
+SRC_DIR=./src/
+TST_DIR=./testes/
 
-all: regra1 regra2 regran
+all: $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)support.o
+	$(LIB_MAKER) $(LIB_DIR)libcthread.a $(BIN_DIR)cdata.o \
+	$(BIN_DIR)cthread.o $(BIN_DIR)support.o
 
-regra1: #dependências para a regra1
-	$(CC) -o $(BIN_DIR)regra1 $(SRC_DIR)regra1.c -Wall
+$(BIN_DIR)cdata.o: $(SRC_DIR)cdata.c
+	$(CC) $(CFLAGS) -c -o $(BIN_DIR)cdata.o -I$(INC_DIR) \
+	$(SRC_DIR)cdata.c
 
-regra2: #dependências para a regra2
-	$(CC) -o $(BIN_DIR)regra2 $(SRC_DIR)regra2.c -Wall
+$(BIN_DIR)cthread.o: $(SRC_DIR)cthread.c
+	$(CC) $(CFLAGS) -c -o $(BIN_DIR)cthread.o -I$(INC_DIR) \
+	$(SRC_DIR)cthread.c
 
-regran: #dependências para a regran
-	$(CC) -o $(BIN_DIR)regran $(SRC_DIR)regran.c -Wall
-
+# New link of support.o because it's removed in clean up process
 clean:
-	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
-
-
+	rm -rf $(BIN_DIR)*.o $(SRC_DIR)*~ $(INC_DIR)*~ $(LIB_DIR)*.a *~ && \
+	ln -s ./resources/support.o $(BIN_DIR)support.o
