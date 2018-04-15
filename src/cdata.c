@@ -70,12 +70,15 @@ int dispatch(void)
         if (control->running_thread == NULL)
         {       
                 // try to get first element of control.apto
-                if (FirstFila2(control.apto))
+                if (FirstFila2(control.apto) != 0)
                         return ERROR;
 
                 // first element of control.apto is the threat that will run
                 TCB_t* nextToRun = GetAtIteratorFila2(control.apto);
-                control.running_thread = nextToRun;      
+                control.running_thread = nextToRun;
+
+                //alter status of thread to EXEC
+                nextTorun->state = PROCST_EXEC;
                 
                 // remove the thread from control.apto
                 DeleteAtIteratorFila2(control.apto);
