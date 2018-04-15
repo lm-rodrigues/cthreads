@@ -20,6 +20,7 @@
 #define	PROCST_APTO_SUS	5
 #define	PROCST_BLOQ_SUS	6
 
+#define ERROR -1
 
 #define TRUE 0
 #define FALSE -1
@@ -44,6 +45,8 @@ typedef struct s_TCB {
 struct _cth{
   /* Verify if the main thread was initialized */
   int init;
+  /* Tid, of last created thread */
+  int last_created_tid;
   /* All threads that are being managed by the library */
   PFILA2 all_threads;
   /* All threads that are ready for execution */
