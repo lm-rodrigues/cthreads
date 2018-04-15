@@ -59,3 +59,30 @@ int init_lib(void){
         return 0;
 }
 
+// TODO: test dispatch
+/* Dispatch the head of control.apto
+   Return 0 if succeds,
+         ERROR if not.
+*/
+int dispatch(void)
+{
+        // to dispatch a thread to run, no thread must be executing.
+        if (control->running_thread == NULL)
+        {       
+                // try to get first element of control.apto
+                if (FirstFila2(control.apto))
+                        return ERROR;
+
+                // first element of control.apto is the threat that will run
+                TCB_t* nextToRun = GetAtIteratorFila2(control.apto);
+                control.running_thread = nextToRun;      
+                
+                // remove the thread from control.apto
+                DeleteAtIteratorFila2(control.apto);
+        }
+        else
+        {
+                return ERROR;
+        }
+        return 0;
+}
