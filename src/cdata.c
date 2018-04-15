@@ -23,11 +23,13 @@ int init_lib(void){
           exploits short-circuit behaviour to better performance. */
         if ( CreateFila2(control.all_threads) && CreateFila2(control.apto) &&
              CreateFila2(control.apto_suspenso) ){
-          return -1;
+          return ERROR;
         }
 	
         /* Set the library as initialized */
         control.init = TRUE;
+	/*Set last tid as 0 (Main Thread) */
+	control.last_created_tid = 0;
 
         /* Create main thread with TID = 0 */
         main_thread = (TCB_t*)malloc(sizeof(TCB_t));
