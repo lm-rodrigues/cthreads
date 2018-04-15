@@ -65,6 +65,7 @@ extern struct _cth control;
 
 /* Return 0 if susceded, -1 if not. */
 int init_lib(void);
+int dispatcher(void);
 void ended_thread(void);
 int dispatch(void);
 
