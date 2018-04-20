@@ -3,7 +3,7 @@
 #include "../include/support.h"
 #include "../include/cthread.h"
 
-/* Global control struct */
+/* Struct de controle Global */
 struct _cth control = {.init = FALSE};
 
 
@@ -19,12 +19,12 @@ int ccreate (void* (*start)(void*), void *arg, int prio){
   prio = 0;
   TCB_t* new_thread;
 
-  /* Check if internal variables was initialized */
+  /* Checa se variáveis internas foram inicializadas */
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
 
-  /* Making thread context */
+  /* Cria thread context */
   new_thread = (TCB_t*) malloc(sizeof(TCB_t));
   getcontext(&new_thread->context);
   new_thread->context.uc_stack.ss_sp = (char*) malloc(STACK_SIZE);
@@ -32,16 +32,16 @@ int ccreate (void* (*start)(void*), void *arg, int prio){
   new_thread->context.uc_link = &control.ended_thread;
   makecontext(&new_thread->context, (void (*)(void))start, 1, arg);
 
-  /* Assign to new_thread a TID and initial state */
+  /* Atribiu a new_thread um TID e um estadao inicial */
   control.last_created_tid++;
   new_thread->tid = control.last_created_tid;
   new_thread->state = PROCST_APTO;
 
-  /* Put new_thread it into proper queues */
+  /* Coloca a new_thread na fila de APTO*/
   AppendFila2(control.all_threads, (void *) new_thread);
   AppendFila2(control.apto, (void *) new_thread);
 
-  /* Return the Thread Identifier*/
+  /* Returna o Thread Identifier (TID) */
   return new_thread->tid;
 }
 
@@ -54,7 +54,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio){
    Se erro    => Valor negativo. */
 int cyield(void){
 
-  /* Check if internal variables was initialized */
+  /* Checa se variáveis internas foram inicializadas */
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
