@@ -71,11 +71,58 @@ int cyield(void){
     Se erro    => Valor negativo. */
 int csem_init(csem_t *sem, int count)
 {
+  //checar se variaveis internas foram inicializadas
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  //inicializar o semáforo
   sem->count = count;
+  sem->fila = (PFILA2) malloc(sizeof(PFILA2));
   if (CreateFila2(sem->fila))
     return ERROR;
   return 0;
 }
+
+/*
+  Parâmetros:
+    sem: ponteiro para estrutura de semáforo
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo. */
+int cwait(csem_t *sem)
+{
+  //checar se variaveis internas foram inicializadas
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  //se o recurso estiver livre, decrementar.
+  if (sem->count > 0)
+  {
+    sem->count--;
+    return 0;
+  }
+  //caso contrário, a thread será colocada em estado de bloqueio
+  else
+  {
+    control->running_thread.state = PROCST_BLOQ;
+    if (AppendFila2(sem.fila, control.running_thread))
+    {
+      //em caso de erro, recolocar a thread no estado de EXEC e retornar erro
+      control0>running_thread.state = PROCST_EXEC;
+      return ERROR;
+    }
+    //se tudo tiver ocorrido certo, chamar dispatcher
+    return dispatcher();
+  }
+
+  return 0;
+}
+
+
+
+
 
 /*
  Parâmetros:
