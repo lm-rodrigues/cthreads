@@ -62,6 +62,20 @@ int cyield(void){
   return dispatcher();
 }
 
+/*
+  Parâmetros:
+    sem: ponteiro para estrutura de semáforo a ser inicializada
+    count: numero de recursos que o semáforo controla
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo. */
+int csem_init(csem_t *sem, int count)
+{
+  sem->count = count;
+  if (CreateFila2(sem->fila))
+    return ERROR;
+  return 0;
+}
 
 /*
  Parâmetros:
