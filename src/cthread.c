@@ -107,20 +107,65 @@ int cwait(csem_t *sem)
   else
   {
     control->running_thread.state = PROCST_BLOQ;
-    if (AppendFila2(sem.fila, control.running_thread))
+    if (AppendFila2(sem->fila, (void*)control.running_thread))
     {
       //em caso de erro, recolocar a thread no estado de EXEC e retornar erro
-      control0>running_thread.state = PROCST_EXEC;
+      control->running_thread.state = PROCST_EXEC;
       return ERROR;
     }
-    //se tudo tiver ocorrido certo, chamar dispatcher
-    return dispatcher();
+    sem->count--;
+    return dispatcher();    
   }
 
-  return 0;
+  //Não deve chegar aqui
+  return ERROR;
 }
 
+/*
+  Parâmetros:
+    sem: ponteiro para estrutura de semáforo
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo. */
+inc csignal(csem_t* sem)
+{
+  //checar se variaveis internas foram inicializadas
+  if (control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+  
+  TCB_t* blocked_thread;
 
+  //incrementar count
+  sem->count ++;
+
+  //colocar primeira thread da fila em aptos
+  if (FirstFila2(sem->fila))
+  {
+    //em caso de erro, verificar se a fila está vazia.
+    if (NextFila2(sem->fila) == -NXTFILA_VAZIA)
+    {
+      return 0;
+    }
+    //se não estiver, ocorreu um erro
+    return ERROR;
+  }
+
+  blocked_thread = GetAtIteratorFila2(sem->fila);
+  if (blocked_thread==NULL)
+  {
+    //como a fila não está vazia ocorreu um erro de iterador
+    return ERROR;
+  }
+
+  //remover a thread da fila do semáforo
+  DeleteAtIteratorFila2(sem->fila, blocked_thread);
+
+  //mudar o estado da thread para apto
+  blocked_thread->state = PROCST_APTO;
+  //colocar a thread na fila de aptos
+  return AppendFila2(control.apto, (void*) blocked_thread);
+}
 
 
 
