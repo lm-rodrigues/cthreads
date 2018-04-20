@@ -88,7 +88,7 @@ int csem_init(csem_t *sem, int count)
 int cidentify (char *name, int size) {
 #define GROUP_NAMES_SIZE 92
 
-  char group_names[] = "Arthur L. Fuchs, 00261577 \nGabriel Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
+  char group_names[] = "Arthur L. Fuchs, 00261577 \nGabriel Fonseca Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
   int i = 0;
 
   if ( !name ) {
