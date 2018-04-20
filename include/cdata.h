@@ -67,6 +67,5 @@ extern struct _cth control;
 int init_lib(void);
 int dispatcher(void);
 void ended_thread(void);
-int dispatch(void);
 
 #endif
