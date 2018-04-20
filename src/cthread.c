@@ -103,22 +103,20 @@ int cwait(csem_t *sem)
     sem->count--;
     return 0;
   }
-  //caso contrário, a thread será colocada em estado de bloqueio
+  //caso contrário, colocar a thread na FIFO do semaforo
   else
   {
-    control->running_thread.state = PROCST_BLOQ;
     if (AppendFila2(sem->fila, (void*)control.running_thread))
     {
-      //em caso de erro, recolocar a thread no estado de EXEC e retornar erro
-      control->running_thread.state = PROCST_EXEC;
       return ERROR;
     }
+    //bloquear thread e diminuir count do semaforo;
+    control->running_thread.state = PROCST_BLOQ;
     sem->count--;
     return dispatcher();    
   }
 
-  //Não deve chegar aqui
-  return ERROR;
+  return 0;
 }
 
 /*
@@ -139,7 +137,7 @@ inc csignal(csem_t* sem)
   //incrementar count
   sem->count ++;
 
-  //colocar primeira thread da fila em aptos
+  //mover iterador para primeira thread da fila do semaforo
   if (FirstFila2(sem->fila))
   {
     //em caso de erro, verificar se a fila está vazia.
