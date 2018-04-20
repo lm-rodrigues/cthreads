@@ -1,10 +1,10 @@
 /*
- * cthread.h: arquivo de inclusão com os protótipos das funções a serem
- *            implementadas na realização do trabalho.
+ * cthread.h: arquivo de inclusÃ£o com os protÃ³tipos das funÃ§Ãµes a serem
+ *            implementadas na realizaÃ§Ã£o do trabalho.
  *
- * NÃO MODIFIQUE ESTE ARQUIVO.
+ * NÃƒO MODIFIQUE ESTE ARQUIVO.
  *
- * VERSÃO: 17/03/2018
+ * VERSÃƒO: 17/03/2018
  *
  */
 #ifndef __cthread__
@@ -13,15 +13,15 @@
 #include "support.h"
 
 typedef struct s_sem {
-	int	count;	/* indica se recurso está ocupado ou não (livre > 0, ocupado = 0) */
-	PFILA2	fila; 	/* ponteiro para uma fila de threads bloqueadas no semáforo */
+	int	count;	/* indica se recurso estÃ¡ ocupado ou nÃ£o (livre > 0, ocupado = 0) */
+	PFILA2	fila; 	/* ponteiro para uma fila de threads bloqueadas no semÃ¡foro */
 } csem_t;
 
 /******************************************************************************
-Parâmetros:
-	name:	ponteiro para uma área de memória onde deve ser escrito um string que contém os nomes dos componentes do grupo e seus números de cartão.
+ParÃ¢metros:
+	name:	ponteiro para uma Ã¡rea de memÃ³ria onde deve ser escrito um string que contÃ©m os nomes dos componentes do grupo e seus nÃºmeros de cartÃ£o.
 		Deve ser uma linha por componente.
-	size:	quantidade máxima de caracteres que podem ser copiados para o string de identificação dos componentes do grupo.
+	size:	quantidade mÃ¡xima de caracteres que podem ser copiados para o string de identificaÃ§Ã£o dos componentes do grupo.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -29,10 +29,10 @@ Retorno:
 int cidentify (char *name, int size);
 
 /******************************************************************************
-Parâmetros:
-	start:	ponteiro para a função que a thread executará.
-	arg:	um parâmetro que pode ser passado para a thread na sua criação.
-	prio:	NÃO utilizado neste semestre, deve ser sempre zero.
+ParÃ¢metros:
+	start:	ponteiro para a funÃ§Ã£o que a thread executarÃ¡.
+	arg:	um parÃ¢metro que pode ser passado para a thread na sua criaÃ§Ã£o.
+	prio:	NÃƒO utilizado neste semestre, deve ser sempre zero.
 Retorno:
 	Se correto => Valor positivo, que representa o identificador da thread criada
 	Se erro	   => Valor negativo.
@@ -40,8 +40,8 @@ Retorno:
 int ccreate (void* (*start)(void*), void *arg, int prio);
 
 /******************************************************************************
-Parâmetros:
-	Sem parâmetros
+ParÃ¢metros:
+	Sem parÃ¢metros
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -49,8 +49,8 @@ Retorno:
 int cyield(void);
 
 /******************************************************************************
-Parâmetros:
-	tid:	identificador da thread cujo término está sendo aguardado.
+ParÃ¢metros:
+	tid:	identificador da thread cujo tÃ©rmino estÃ¡ sendo aguardado.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -58,7 +58,7 @@ Retorno:
 int cjoin(int tid);
 
 /******************************************************************************
-Parâmetros:
+ParÃ¢metros:
 	tid:	identificador da thread a ser suspensa.
 Retorno:
 	Se correto => 0 (zero)
@@ -67,8 +67,8 @@ Retorno:
 int csuspend(int tid);
 
 /******************************************************************************
-Parâmetros:
-	tid:	identificador da thread que terá sua execução retomada.
+ParÃ¢metros:
+	tid:	identificador da thread que terÃ¡ sua execuÃ§Ã£o retomada.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -76,9 +76,9 @@ Retorno:
 int cresume(int tid);
 
 /******************************************************************************
-Parâmetros:
-	sem:	ponteiro para uma variável do tipo csem_t. Aponta para uma estrutura de dados que representa a variável semáforo.
-	count: valor a ser usado na inicialização do semáforo. Representa a quantidade de recursos controlados pelo semáforo.
+ParÃ¢metros:
+	sem:	ponteiro para uma variÃ¡vel do tipo csem_t. Aponta para uma estrutura de dados que representa a variÃ¡vel semÃ¡foro.
+	count: valor a ser usado na inicializaÃ§Ã£o do semÃ¡foro. Representa a quantidade de recursos controlados pelo semÃ¡foro.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -86,8 +86,8 @@ Retorno:
 int csem_init(csem_t *sem, int count);
 
 /******************************************************************************
-Parâmetros:
-	sem:	ponteiro para uma variável do tipo semáforo.
+ParÃ¢metros:
+	sem:	ponteiro para uma variÃ¡vel do tipo semÃ¡foro.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
@@ -95,8 +95,8 @@ Retorno:
 int cwait(csem_t *sem);
 
 /******************************************************************************
-Parâmetros:
-	sem:	ponteiro para uma variável do tipo semáforo.
+ParÃ¢metros:
+	sem:	ponteiro para uma variÃ¡vel do tipo semÃ¡foro.
 Retorno:
 	Se correto => 0 (zero)
 	Se erro	   => Valor negativo.
