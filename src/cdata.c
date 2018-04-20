@@ -46,7 +46,6 @@ int init_lib(void){
   control.ended_thread.uc_link = NULL;
   control.ended_thread.uc_stack.ss_sp = (char*) malloc(STACK_SIZE);
   control.ended_thread.uc_stack.ss_size = STACK_SIZE;
-  //TODO: IMPLEMENTAR ENDED_THREAD
   makecontext(&control.ended_thread, (void (*)(void))ended_thread, 0);
 
   /* Define Main thread como executando */
@@ -116,4 +115,47 @@ int dispatcher(){
   }
 
   return 0;
+}
+
+/* Rotina a ser executada sempre que uma thread terminar sua execução. */
+void ended_thread(void){
+  /* Atualiza contexto para proxima chamada*/
+  getcontext(&control.ended_thread);
+
+  /* Verifica se esta é uma RELEASER_THREAD*/
+  release_verification();
+
+  control.running_thread->state = PROCST_TERMINO;
+  dispatcher();
+
+  /* Verifica se não existem mais threads*/
+  if (GetAtIteratorFila2(control.all_threads) == NULL)
+    cclean();
+}
+
+/* Verifica se uma thread que chegou ao final de sua execução
+   possui outra thread aguardando seu final. */
+void release_verification(void){
+  csem_t* sem;
+
+  /* Procura a thread que chegou ao final em releaser threads. */
+  sem = SearchReleaserThreadSemaphore(control.releaser_threads, control.running_thread->tid);
+
+  /* Caso não haja nenhuma thread esperando pela thread finalizada. */
+  if (sem != NULL) {
+    /* Desbloqueia thread que está aguardando pela thread finalizada. */
+    csignal(sem);
+
+    /* Remove a thread finalizada de releaser threads. */
+    DeleteReleaserThread(control.releaser_threads, control.running_thread->tid);
+    free(sem);
+  }
+}
+
+void cclean(){
+  DestroyFILA2(control.all_threads);
+  DestroyFILA2(control.able);
+  DestroyFILA2(control.able_suspended);
+  DestroyFILA2(control.releaser_threads);
+
 }

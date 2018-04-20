@@ -27,3 +27,53 @@ int DeleteFromFila2(PFILA2 fila, TCB_t *tcb){
   }
   return 0;
 }
+
+/* Procura um Releaser Thread e retorna o seu semaforo. */
+csem_t* SearchReleaserThreadSemaphore(PFILA2 releaser_threads_queue, int tid){
+  releaser_thread_control* rtc_aux;
+
+  /* Define o iterador no inicio da fila */
+  FirstFila2(releaser_threads_queue);
+
+  /* Itera na lista procurando o nodo necessário */
+  while((rtc_aux=GetAtIteratorFila2(releaser_threads_queue))) {
+    /* Verifica se achou o nodo a retornar */
+    if (rtc_aux->tid == tid)
+      return rtc_aux->sem;
+    else
+      NextFila2(releaser_threads_queue);
+  }
+  return NULL;
+}
+
+/* Remove uma Releaser Thread de uma fila */
+void DeleteReleaserThread(PFILA2 releaser_threads_queue, int tid){
+  releaser_thread_control* rtc_aux;
+
+  /* Define o iterador no inicio da fila */
+  FirstFila2(releaser_threads_queue);
+
+  /* Itera na lista e remove o nodo necessário */
+  while((rtc_aux=GetAtIteratorFila2(releaser_threads_queue))) {
+    if (rtc_aux->tid == tid)
+      DeleteAtIteratorFila2(releaser_threads_queue);
+    else
+      NextFila2(releaser_threads_queue);
+  }
+}
+
+/* Destrói uma fila */
+void DestroyFILA2(PFILA2 queue){
+  /* Define o iterador no inicio da fila */
+  FirstFila2(queue);
+
+  /* Itera na lista e remove nodos */
+  while(DeleteAtIteratorFila2(queue)) {
+      NextFila2(queue);
+  }
+  /* Desaloca a fila da memória. */
+  free(queue->first);
+  free(queue->last);
+  free(queue->it);
+  free(queue);
+}
