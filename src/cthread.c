@@ -4,7 +4,7 @@
 #include "../include/cthread.h"
 
 /* Struct de controle Global */
-struct _cth control = {.init = FALSE};
+struct lib_control control = {.init = FALSE};
 
 
 /*
@@ -39,7 +39,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio){
 
   /* Coloca a new_thread na fila de APTO*/
   AppendFila2(control.all_threads, (void *) new_thread);
-  AppendFila2(control.apto, (void *) new_thread);
+  AppendFila2(control.able, (void *) new_thread);
 
   /* Returna o Thread Identifier (TID) */
   return new_thread->tid;
@@ -86,8 +86,6 @@ int csem_init(csem_t *sem, int count)
    Se correto => 0 (zero)
    Se erro    => Valor negativo. */
 int cidentify (char *name, int size) {
-#define GROUP_NAMES_SIZE 92
-
   char group_names[] = "Arthur L. Fuchs, 00261577 \nGabriel Fonseca Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
   int i = 0;
 
