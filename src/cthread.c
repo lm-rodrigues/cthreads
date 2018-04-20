@@ -71,11 +71,101 @@ int cyield(void){
     Se erro    => Valor negativo. */
 int csem_init(csem_t *sem, int count)
 {
+  //checar se variaveis internas foram inicializadas
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  //inicializar o semáforo
   sem->count = count;
+  sem->fila = (PFILA2) malloc(sizeof(PFILA2));
   if (CreateFila2(sem->fila))
     return ERROR;
   return 0;
 }
+
+/*
+  Parâmetros:
+    sem: ponteiro para estrutura de semáforo
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo. */
+int cwait(csem_t *sem)
+{
+  //checar se variaveis internas foram inicializadas
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  //se o recurso estiver livre, decrementar.
+  if (sem->count > 0)
+  {
+    sem->count--;
+    return 0;
+  }
+  //caso contrário, colocar a thread na FIFO do semaforo
+  else
+  {
+    if (AppendFila2(sem->fila, (void*)control.running_thread))
+    {
+      return ERROR;
+    }
+    //bloquear thread e diminuir count do semaforo;
+    control->running_thread.state = PROCST_BLOQ;
+    sem->count--;
+    return dispatcher();    
+  }
+
+  return 0;
+}
+
+/*
+  Parâmetros:
+    sem: ponteiro para estrutura de semáforo
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo. */
+inc csignal(csem_t* sem)
+{
+  //checar se variaveis internas foram inicializadas
+  if (control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+  
+  TCB_t* blocked_thread;
+
+  //incrementar count
+  sem->count ++;
+
+  //mover iterador para primeira thread da fila do semaforo
+  if (FirstFila2(sem->fila))
+  {
+    //em caso de erro, verificar se a fila está vazia.
+    if (NextFila2(sem->fila) == -NXTFILA_VAZIA)
+    {
+      return 0;
+    }
+    //se não estiver, ocorreu um erro
+    return ERROR;
+  }
+
+  blocked_thread = GetAtIteratorFila2(sem->fila);
+  if (blocked_thread==NULL)
+  {
+    //como a fila não está vazia ocorreu um erro de iterador
+    return ERROR;
+  }
+
+  //remover a thread da fila do semáforo
+  DeleteAtIteratorFila2(sem->fila, blocked_thread);
+
+  //mudar o estado da thread para apto
+  blocked_thread->state = PROCST_APTO;
+  //colocar a thread na fila de aptos
+  return AppendFila2(control.apto, (void*) blocked_thread);
+}
+
+
 
 /*
  Parâmetros:
