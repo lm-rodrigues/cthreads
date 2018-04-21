@@ -134,15 +134,15 @@ inc csignal(csem_t* sem)
   
   TCB_t* blocked_thread;
 
-  //incrementar count
-  sem->count ++;
-
+  
   //mover iterador para primeira thread da fila do semaforo
   if (FirstFila2(sem->fila))
   {
     //em caso de erro, verificar se a fila está vazia.
     if (NextFila2(sem->fila) == -NXTFILA_VAZIA)
     {
+      //incrementar count
+      sem->count ++;
       return 0;
     }
     //se não estiver, ocorreu um erro
@@ -156,13 +156,24 @@ inc csignal(csem_t* sem)
     return ERROR;
   }
 
-  //remover a thread da fila do semáforo
+  //colocar a thread na fila de aptos
+  if (AppendFila2(control.apto, (void*) blocked_thread))
+  {
+    //se não conseguir, retornar erro
+    return ERROR;
+  }
+
+  //remover a thread da fila do semáforo 
+  // -> não deve ocorrer erro pois erros de iterador invalido e
+  // fila vazia já foram tratados anteriormente.
   DeleteAtIteratorFila2(sem->fila, blocked_thread);
 
   //mudar o estado da thread para apto
   blocked_thread->state = PROCST_APTO;
-  //colocar a thread na fila de aptos
-  return AppendFila2(control.apto, (void*) blocked_thread);
+
+  //incrementar count
+  sem->count ++;
+  return 0;
 }
 
 
