@@ -32,7 +32,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio){
   new_thread->context.uc_link = &control.ended_thread;
   makecontext(&new_thread->context, (void (*)(void))start, 1, arg);
 
-  /* Atribiu a new_thread um TID e um estadao inicial */
+  /* Atribui a new_thread um TID e um estado inicial */
   control.last_created_tid++;
   new_thread->tid = control.last_created_tid;
   new_thread->state = PROCST_APTO;
@@ -71,12 +71,12 @@ int cyield(void){
     Se erro    => Valor negativo. */
 int csem_init(csem_t *sem, int count)
 {
-  //checar se variaveis internas foram inicializadas
+  // Checar se variaveis internas foram inicializadas
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
 
-  //inicializar o semáforo
+  // Inicializar o semáforo
   sem->count = count;
   sem->fila = (PFILA2) malloc(sizeof(PFILA2));
   if (CreateFila2(sem->fila))
@@ -92,25 +92,25 @@ int csem_init(csem_t *sem, int count)
     Se erro    => Valor negativo. */
 int cwait(csem_t *sem)
 {
-  //checar se variaveis internas foram inicializadas
+  // Checar se variaveis internas foram inicializadas
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
 
-  //se o recurso estiver livre, decrementar.
+  // Se o recurso estiver livre, decrementar
   if (sem->count > 0)
   {
     sem->count--;
     return 0;
   }
-  //caso contrário, colocar a thread na FIFO do semaforo
+  // Caso contrário, colocar a thread na FIFO do semáforo
   else
   {
     if (AppendFila2(sem->fila, (void*)control.running_thread))
     {
       return ERROR;
     }
-    //bloquear thread e diminuir count do semaforo;
+    // Bloquear thread e diminuir count do semáforo;
     control->running_thread.state = PROCST_BLOQ;
     sem->count--;
     return dispatcher();    
@@ -127,7 +127,7 @@ int cwait(csem_t *sem)
     Se erro    => Valor negativo. */
 inc csignal(csem_t* sem)
 {
-  //checar se variaveis internas foram inicializadas
+  // Checar se variáveis internas foram inicializadas
   if (control.init == FALSE)
     if(init_lib())
       return ERROR;
@@ -135,43 +135,43 @@ inc csignal(csem_t* sem)
   TCB_t* blocked_thread;
 
   
-  //mover iterador para primeira thread da fila do semaforo
+  // Mover iterador para primeira thread da fila do semáforo
   if (FirstFila2(sem->fila))
   {
-    //em caso de erro, verificar se a fila está vazia.
+    // Em caso de erro, verificar se a fila está vazia
     if (NextFila2(sem->fila) == -NXTFILA_VAZIA)
     {
-      //incrementar count
+      // Incrementar count
       sem->count ++;
       return 0;
     }
-    //se não estiver, ocorreu um erro
+    // Se não estiver, ocorreu um erro
     return ERROR;
   }
 
   blocked_thread = GetAtIteratorFila2(sem->fila);
   if (blocked_thread==NULL)
   {
-    //como a fila não está vazia ocorreu um erro de iterador
+    // Como a fila não está vazia ocorreu um erro de iterador
     return ERROR;
   }
 
-  //colocar a thread na fila de aptos
+  // Colocar a thread na fila de APTOS
   if (AppendFila2(control.apto, (void*) blocked_thread))
   {
     //se não conseguir, retornar erro
     return ERROR;
   }
 
-  //remover a thread da fila do semáforo 
-  // -> não deve ocorrer erro pois erros de iterador invalido e
+  // Remover a thread da fila do semáforo 
+  // -> Não deve ocorrer erro pois erros de iterador invalido e
   // fila vazia já foram tratados anteriormente.
   DeleteAtIteratorFila2(sem->fila, blocked_thread);
 
-  //mudar o estado da thread para apto
+  // Mudar o estado da thread para APTO
   blocked_thread->state = PROCST_APTO;
 
-  //incrementar count
+  // Incrementar count
   sem->count ++;
   return 0;
 }
