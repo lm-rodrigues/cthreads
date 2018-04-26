@@ -84,7 +84,7 @@ int csuspend(int tid)
   if (tr->state == PROCST_BLOQ)
   {
     //apenas mudar para PROCST_BLOQ_SUS
-    tr->state = PROCST_APTO_SUS;
+    tr->state = PROCST_BLOQ_SUS;
     return 0;
   }
 
@@ -109,6 +109,10 @@ int csuspend(int tid)
 }
 
 
+int cresume(int tid)
+{
+  /
+}
 
 /*
   Parâmetros:
