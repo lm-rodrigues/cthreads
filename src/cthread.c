@@ -64,6 +64,54 @@ int cyield(void){
 
 /*
   Parâmetros:
+	tid:	identificador da thread a ser suspensa.
+Retorno:
+	Se correto => 0 (zero)
+	Se erro	   => Valor negativo.
+*/
+int csuspend(int tid)
+{
+  TCB_t* tr;
+  //procurar a thread na lista all_threads
+  tr = search_thread(all_threads, tid)
+  if (tr == NULL)
+  {
+    //se a thread não existir, retornar ERROR
+    return ERROR;
+  }
+
+  //se o estado da thread for bloqueado,
+  if (tr->state == PROCST_BLOQ)
+  {
+    //apenas mudar para PROCST_BLOQ_SUS
+    tr->state = PROCST_APTO_SUS;
+    return 0;
+  }
+
+  //se o estado da thread for apto
+  if (tr->state == PROCST_APTO)
+  {
+    //retirar a thread da fila de aptos e colocar no estado de apto-suspenso.
+    if (DeleteFromFila2(able, tr))
+    {
+      //tratar erro
+    }
+    if (AppendFila2(able_suspended, (void*) tr))
+    {
+      //tratar erro;
+    }
+    tr->state = PROCST_APTO_SUS;
+    return 0;
+  }
+
+  //se o estado  não for bloqueado, nem apto, apenas retornar ERROR
+  return ERROR;
+}
+
+
+
+/*
+  Parâmetros:
     sem: ponteiro para estrutura de semáforo a ser inicializada
     count: numero de recursos que o semáforo controla
   Retorno:
@@ -168,8 +216,15 @@ inc csignal(csem_t* sem)
   // fila vazia já foram tratados anteriormente.
   DeleteAtIteratorFila2(sem->fila, blocked_thread);
 
-  // Mudar o estado da thread para APTO
-  blocked_thread->state = PROCST_APTO;
+  //mudar o estado da thread para apto
+  if (blocked_thread->state == PROCST_BLOQ_SUS)
+  {
+    blocked_thread->state = PROCST_APTO_SUS;
+  }
+  else
+  {
+    blocked_thread->state = PROCST_APTO;
+  }
 
   // Incrementar count
   sem->count ++;

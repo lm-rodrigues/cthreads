@@ -77,3 +77,24 @@ void DestroyFILA2(PFILA2 queue){
   free(queue->it);
   free(queue);
 }
+
+/* Procura uma thread eu uma fila */
+TCB_t* searchThread(PFILA2 queue, int tid)
+{
+  TCB_t *tr;
+  /* Define o iterador no inicio da fila */
+  FirstFila2(queue);
+
+  while (tr = GetAtIteratorFila2(queue))
+  {
+    if (tr->tid == tid)
+    {
+      return tr;
+    }
+    else
+    {
+      NextFila2(queue);
+    }
+  }
+  return NULL;
+}

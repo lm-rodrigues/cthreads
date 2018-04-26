@@ -11,5 +11,15 @@ csem_t* SearchReleaserThreadSemaphore(PFILA2 releaser_threads_queue, int tid);
 /* Remove uma Releaser Thread de uma fila. */
 void DeleteReleaserThread(PFILA2 releaser_threads_queue, int tid);
 
-/*Destrói uma fila. */
+/* Destrói uma fila. */
 void DestroyFILA2(PFILA2 queue);
+
+/*  Procura uma thread em uma fila. 
+    Parametros: 
+        queue: PFILA2 - fila a ser vasculhada
+        tid : int - tid da thread a ser procurada
+    Retorna: o ponteiro para o TCB da thread se achou
+             um valor negativo se ocorrer um erro
+                */
+TCB_t* searchThread(PFILA2 queue, int tid);
+
