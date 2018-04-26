@@ -121,7 +121,12 @@ int csuspend(int tid){
 int cresume(int tid){
   TCB_t* tr;
 
-  tr = search_thread(all_threads, tid)
+  /* Checa se variáveis internas foram inicializadas */
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  tr = search_thread(control.all_threads, tid)
   if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
@@ -137,10 +142,10 @@ int cresume(int tid){
   // Se o estado da thread for apto-suspenso
   if (tr->state == PROCST_APTO_SUS){
     //retirar a thread da fila de aptos-supensos e colocar no estado de apto.
-    if (DeleteFromFila2(able_suspended, tr)){
+    if (DeleteFromFila2(control.able_suspended, tr)){
       // Tratar erro
     }
-    if (AppendFila2(able, (void*) tr)){
+    if (AppendFila2(control.able, (void*) tr)){
       // Tratar erro;
     }
 
