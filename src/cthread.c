@@ -70,10 +70,16 @@ int cyield(void){
 	 Se erro	   => Valor negativo.
 */
 int csuspend(int tid){
+
+  /* Checa se variáveis internas foram inicializadas */
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
   TCB_t* tr;
 
   // Procurar a thread na lista all_threads
-  tr = search_thread(all_threads, tid)
+  tr = search_thread(control.all_threads, tid)
   if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
@@ -89,10 +95,10 @@ int csuspend(int tid){
   // Se o estado da thread for apto
   if (tr->state == PROCST_APTO){
     // Retirar a thread da fila de aptos e colocar no estado de apto-suspenso
-    if (DeleteFromFila2(able, tr)){
+    if (DeleteFromFila2(control.able, tr)){
       // Tratar erro
     }
-    if (AppendFila2(able_suspended, (void*) tr)){
+    if (AppendFila2(control.able_suspended, (void*) tr)){
       // Tratar erro;
     }
 
