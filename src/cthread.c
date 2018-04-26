@@ -72,33 +72,33 @@ Retorno:
 int csuspend(int tid)
 {
   TCB_t* tr;
-  //procurar a thread na lista all_threads
+  // Procurar a thread na lista all_threads
   tr = search_thread(all_threads, tid)
   if (tr == NULL)
   {
-    //se a thread não existir, retornar ERROR
+    // Se a thread não existir, retornar ERROR
     return ERROR;
   }
 
-  //se o estado da thread for bloqueado,
+  // Se o estado da thread for bloqueado,
   if (tr->state == PROCST_BLOQ)
   {
-    //apenas mudar para PROCST_BLOQ_SUS
+    // Apenas mudar para PROCST_BLOQ_SUS
     tr->state = PROCST_BLOQ_SUS;
     return 0;
   }
 
-  //se o estado da thread for apto
+  // Ae o estado da thread for apto
   if (tr->state == PROCST_APTO)
   {
-    //retirar a thread da fila de aptos e colocar no estado de apto-suspenso.
+    // Retirar a thread da fila de aptos e colocar no estado de apto-suspenso
     if (DeleteFromFila2(able, tr))
     {
-      //tratar erro
+      // Tratar erro
     }
     if (AppendFila2(able_suspended, (void*) tr))
     {
-      //tratar erro;
+      // Tratar erro;
     }
     tr->state = PROCST_APTO_SUS;
     return 0;
@@ -109,9 +109,44 @@ int csuspend(int tid)
 }
 
 
-int cresume(int tid)
-{
-  /
+/*
+  Parâmetros:
+  tid:  identificador da thread a ser suspensa.
+Retorno:
+  Se correto => 0 (zero)
+  Se erro    => Valor negativo.
+*/
+int cresume(int tid){
+  TCB_t* tr;
+
+  tr = search_thread(all_threads, tid)
+  if (tr == NULL){
+    // Se a thread não existir, retornar ERROR
+    return ERROR;
+  }
+
+  // Se o estado da thread for bloqueado-suspenso
+  if (tr->state == PROCST_BLOQ_SUS){
+    // Mudar para o estado bloqueado
+    tr->state = PROCST_BLOQ;
+    return 0;
+  }
+
+  // Se o estado da thread for apto-suspenso
+  if (tr->state == PROCST_APTO_SUS){
+    //retirar a thread da fila de aptos-supensos e colocar no estado de apto.
+    if (DeleteFromFila2(able_suspended, tr))
+    {
+      // Tratar erro
+    }
+    if (AppendFila2(able, (void*) tr))
+    {
+      // Tratar erro;
+    }
+    tr->state = PROCST_APTO;
+    return 0;
+  }
+
 }
 
 /*
