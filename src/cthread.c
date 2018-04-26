@@ -146,7 +146,8 @@ int cresume(int tid){
     tr->state = PROCST_APTO;
     return 0;
   }
-
+  // Se o restado não for bloqueado-suspenso e nem apto-suspenso, retornar ERROR
+  return ERROR;
 }
 
 /*
