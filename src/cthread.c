@@ -64,57 +64,53 @@ int cyield(void){
 
 /*
   Parâmetros:
-	tid:	identificador da thread a ser suspensa.
-Retorno:
-	Se correto => 0 (zero)
-	Se erro	   => Valor negativo.
+	 tid:	Identificador da thread a ser suspensa.
+  Retorno:
+	 Se correto => 0 (zero)
+	 Se erro	   => Valor negativo.
 */
-int csuspend(int tid)
-{
+int csuspend(int tid){
   TCB_t* tr;
+
   // Procurar a thread na lista all_threads
   tr = search_thread(all_threads, tid)
-  if (tr == NULL)
-  {
+  if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
   }
 
   // Se o estado da thread for bloqueado,
-  if (tr->state == PROCST_BLOQ)
-  {
-    // Apenas mudar para PROCST_BLOQ_SUS
+  if (tr->state == PROCST_BLOQ){
+    // Apenas mudar para bloqueado-suspenso
     tr->state = PROCST_BLOQ_SUS;
     return 0;
   }
 
-  // Ae o estado da thread for apto
-  if (tr->state == PROCST_APTO)
-  {
+  // Se o estado da thread for apto
+  if (tr->state == PROCST_APTO){
     // Retirar a thread da fila de aptos e colocar no estado de apto-suspenso
-    if (DeleteFromFila2(able, tr))
-    {
+    if (DeleteFromFila2(able, tr)){
       // Tratar erro
     }
-    if (AppendFila2(able_suspended, (void*) tr))
-    {
+    if (AppendFila2(able_suspended, (void*) tr)){
       // Tratar erro;
     }
+
     tr->state = PROCST_APTO_SUS;
     return 0;
   }
 
-  //se o estado  não for bloqueado, nem apto, apenas retornar ERROR
+  // Se o estado  não for bloqueado, nem apto, apenas retornar ERROR
   return ERROR;
 }
 
 
 /*
   Parâmetros:
-  tid:  identificador da thread a ser suspensa.
-Retorno:
-  Se correto => 0 (zero)
-  Se erro    => Valor negativo.
+    tid:  identificador da thread a ser suspensa.
+  Retorno:
+    Se correto => 0 (zero)
+    Se erro    => Valor negativo.
 */
 int cresume(int tid){
   TCB_t* tr;
@@ -135,30 +131,29 @@ int cresume(int tid){
   // Se o estado da thread for apto-suspenso
   if (tr->state == PROCST_APTO_SUS){
     //retirar a thread da fila de aptos-supensos e colocar no estado de apto.
-    if (DeleteFromFila2(able_suspended, tr))
-    {
+    if (DeleteFromFila2(able_suspended, tr)){
       // Tratar erro
     }
-    if (AppendFila2(able, (void*) tr))
-    {
+    if (AppendFila2(able, (void*) tr)){
       // Tratar erro;
     }
+
     tr->state = PROCST_APTO;
     return 0;
   }
-  // Se o restado não for bloqueado-suspenso e nem apto-suspenso, retornar ERROR
+  // Se o estado não for bloqueado-suspenso e nem apto-suspenso, retornar ERROR
   return ERROR;
 }
 
 /*
   Parâmetros:
-    sem: ponteiro para estrutura de semáforo a ser inicializada
-    count: numero de recursos que o semáforo controla
+    sem: Ponteiro para estrutura de semáforo a ser inicializada
+    count: Número de recursos que o semáforo controla
   Retorno:
     Se correto => 0 (zero)
     Se erro    => Valor negativo. */
-int csem_init(csem_t *sem, int count)
-{
+int csem_init(csem_t *sem, int count){
+
   // Checar se variaveis internas foram inicializadas
   if(control.init == FALSE)
     if(init_lib())
@@ -174,28 +169,25 @@ int csem_init(csem_t *sem, int count)
 
 /*
   Parâmetros:
-    sem: ponteiro para estrutura de semáforo
+    sem: Ponteiro para estrutura de semáforo
   Retorno:
     Se correto => 0 (zero)
     Se erro    => Valor negativo. */
-int cwait(csem_t *sem)
-{
+int cwait(csem_t *sem){
+
   // Checar se variaveis internas foram inicializadas
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
 
   // Se o recurso estiver livre, decrementar
-  if (sem->count > 0)
-  {
+  if (sem->count > 0){
     sem->count--;
     return 0;
   }
   // Caso contrário, colocar a thread na FIFO do semáforo
-  else
-  {
-    if (AppendFila2(sem->fila, (void*)control.running_thread))
-    {
+  else{
+    if (AppendFila2(sem->fila, (void*)control.running_thread)){
       return ERROR;
     }
     // Bloquear thread e diminuir count do semáforo;
@@ -209,12 +201,11 @@ int cwait(csem_t *sem)
 
 /*
   Parâmetros:
-    sem: ponteiro para estrutura de semáforo
+    sem: Ponteiro para estrutura de semáforo
   Retorno:
     Se correto => 0 (zero)
     Se erro    => Valor negativo. */
-inc csignal(csem_t* sem)
-{
+inc csignal(csem_t* sem){
   // Checar se variáveis internas foram inicializadas
   if (control.init == FALSE)
     if(init_lib())
@@ -222,13 +213,10 @@ inc csignal(csem_t* sem)
   
   TCB_t* blocked_thread;
 
-  
   // Mover iterador para primeira thread da fila do semáforo
-  if (FirstFila2(sem->fila))
-  {
+  if (FirstFila2(sem->fila)){
     // Em caso de erro, verificar se a fila está vazia
-    if (NextFila2(sem->fila) == -NXTFILA_VAZIA)
-    {
+    if (NextFila2(sem->fila) == -NXTFILA_VAZIA){
       // Incrementar count
       sem->count ++;
       return 0;
@@ -238,16 +226,14 @@ inc csignal(csem_t* sem)
   }
 
   blocked_thread = GetAtIteratorFila2(sem->fila);
-  if (blocked_thread==NULL)
-  {
+  if (blocked_thread==NULL){
     // Como a fila não está vazia ocorreu um erro de iterador
     return ERROR;
   }
 
   // Colocar a thread na fila de APTOS
-  if (AppendFila2(control.apto, (void*) blocked_thread))
-  {
-    //se não conseguir, retornar erro
+  if (AppendFila2(control.apto, (void*) blocked_thread)){
+    // Se não conseguir, retornar erro
     return ERROR;
   }
 
@@ -257,12 +243,10 @@ inc csignal(csem_t* sem)
   DeleteAtIteratorFila2(sem->fila, blocked_thread);
 
   //mudar o estado da thread para apto
-  if (blocked_thread->state == PROCST_BLOQ_SUS)
-  {
+  if (blocked_thread->state == PROCST_BLOQ_SUS){
     blocked_thread->state = PROCST_APTO_SUS;
   }
-  else
-  {
+  else{
     blocked_thread->state = PROCST_APTO;
   }
 
@@ -275,21 +259,21 @@ inc csignal(csem_t* sem)
 
 /*
  Parâmetros:
-   name: ponteiro para uma área de memória onde deve ser escrito um string que contém os nomes dos componentes do grupo e seus números de cartão.
+   name: Ponteiro para uma área de memória onde deve ser escrito um string que contém os nomes dos componentes do grupo e seus números de cartão.
          Deve ser uma linha por componente.
-   size: quantidade máxima de caracteres que podem ser copiados para o string de identificação dos componentes do grupo.
+   size: Quantidade máxima de caracteres que podem ser copiados para o string de identificação dos componentes do grupo.
  Retorno:
    Se correto => 0 (zero)
    Se erro    => Valor negativo. */
-int cidentify (char *name, int size) {
+int cidentify (char *name, int size){
   char group_names[] = "Arthur L. Fuchs, 00261577 \nGabriel Fonseca Martins, 00242288 \nLeonardo Marques Rodrigues, 00213751\n";
   int i = 0;
 
-  if ( !name ) {
+  if (!name){
     return ERROR;
   }
-  else {
-    while (i < size-1 && group_names[i] != '\0') {
+  else{
+    while (i < size-1 && group_names[i] != '\0'){
       name[i] = group_names[i];
       i++;
     }
