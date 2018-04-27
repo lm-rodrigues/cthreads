@@ -2,6 +2,7 @@
 #include "../include/cdata.h"
 #include "../include/support.h"
 #include "../include/cthread.h"
+#include "../include/queues.h"
 
 /* Struct de controle Global */
 struct lib_control control = {.init = FALSE};
@@ -62,6 +63,50 @@ int cyield(void){
   return dispatcher();
 }
 
+
+/*
+ Parâmetros:
+   tid:    identificador da thread cujo término está sendo aguardado.
+ Retorno:
+   Se correto => 0 (zero)
+   Se erro    => Valor negativo. */
+int cjoin(int tid){
+  csem_t* block;
+  releaser_thread_control* releaser_thread;
+
+  /* Checa se as variáveis internas foram inicializadas */
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  /* Testa se é um "autobloqueio" */
+  if (tid == control.running_thread->tid)
+    return ERROR;
+
+  /* Testa se tid se refere a uma thread existente*/
+  if (searchThread(control.all_threads, tid) == NULL)
+    return ERROR;
+
+  /* Testa se há outra thread esperando pela thread indicada por tid */
+  if (SearchReleaserThreadSemaphore(control.releaser_threads, tid) != NULL)
+    return ERROR;
+
+  /* Cria um semaforo para bloquear a running_thread */
+  block = (csem_t*) malloc(sizeof(csem_t));
+  csem_init(block, 0);
+
+  /* Cria um releaser thread control para armazenar os dados na fila de releaser_threads */
+  releaser_thread = (releaser_thread_control*) malloc(sizeof(releaser_thread_control));
+  releaser_thread->tid = tid;
+  releaser_thread->sem = block;
+
+  if (AppendFila2(control.releaser_threads, releaser_thread))
+    return ERROR;
+
+  return cwait(block);
+}
+
+
 /*
   Parâmetros:
 	 tid:	Identificador da thread a ser suspensa.
@@ -79,7 +124,7 @@ int csuspend(int tid){
   TCB_t* tr;
 
   // Procurar a thread na lista all_threads
-  tr = search_thread(control.all_threads, tid);
+  tr = searchThread(control.all_threads, tid);
   if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
@@ -127,7 +172,7 @@ int cresume(int tid){
     if(init_lib())
       return ERROR;
 
-  tr = search_thread(control.all_threads, tid)
+  tr = searchThread(control.all_threads, tid);
   if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
@@ -203,7 +248,7 @@ int cwait(csem_t *sem){
       return ERROR;
     }
     // Bloquear thread e diminuir count do semáforo;
-    control->running_thread.state = PROCST_BLOQ;
+    control.running_thread->state = PROCST_BLOQ;
     sem->count--;
     return dispatcher();    
   }
@@ -217,7 +262,7 @@ int cwait(csem_t *sem){
   Retorno:
     Se correto => 0 (zero)
     Se erro    => Valor negativo. */
-inc csignal(csem_t* sem){
+int csignal(csem_t* sem){
   // Checar se variáveis internas foram inicializadas
   if (control.init == FALSE)
     if(init_lib())
@@ -244,7 +289,7 @@ inc csignal(csem_t* sem){
   }
 
   // Colocar a thread na fila de APTOS
-  if (AppendFila2(control.apto, (void*) blocked_thread)){
+  if (AppendFila2(control.able, (void*) blocked_thread)){
     // Se não conseguir, retornar erro
     return ERROR;
   }
