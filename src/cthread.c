@@ -250,7 +250,7 @@ int cwait(csem_t *sem){
     // Bloquear thread e diminuir count do semáforo;
     control.running_thread->state = PROCST_BLOQ;
     sem->count--;
-    return dispatcher();    
+    return dispatcher();
   }
 
   return 0;
@@ -267,7 +267,7 @@ int csignal(csem_t* sem){
   if (control.init == FALSE)
     if(init_lib())
       return ERROR;
-  
+
   TCB_t* blocked_thread;
 
   // Mover iterador para primeira thread da fila do semáforo
@@ -288,24 +288,27 @@ int csignal(csem_t* sem){
     return ERROR;
   }
 
-  // Colocar a thread na fila de APTOS
-  if (AppendFila2(control.able, (void*) blocked_thread)){
-    // Se não conseguir, retornar erro
-    return ERROR;
-  }
-
-  // Remover a thread da fila do semáforo 
-  // -> Não deve ocorrer erro pois erros de iterador invalido e
-  // fila vazia já foram tratados anteriormente.
-  DeleteAtIteratorFila2(sem->fila);
-
-  //mudar o estado da thread para apto
+  //colocar a thread na fila de aptos e mudar seu estado para apto
   if (blocked_thread->state == PROCST_BLOQ_SUS){
+    if (AppendFila2(control.able_suspended, (void*) blocked_thread)){
+      // Se não conseguir, retornar erro
+      return ERROR;
+    }
     blocked_thread->state = PROCST_APTO_SUS;
   }
   else{
+    // Colocar a thread na fila de APTOS
+    if (AppendFila2(control.able, (void*) blocked_thread)){
+      // Se não conseguir, retornar erro
+      return ERROR;
+    }
     blocked_thread->state = PROCST_APTO;
   }
+
+  // Remover a thread da fila do semáforo
+  // -> Não deve ocorrer erro pois erros de iterador invalido e
+  // fila vazia já foram tratados anteriormente.
+  DeleteAtIteratorFila2(sem->fila);
 
   // Incrementar count
   sem->count ++;
