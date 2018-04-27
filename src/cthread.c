@@ -2,6 +2,7 @@
 #include "../include/cdata.h"
 #include "../include/support.h"
 #include "../include/cthread.h"
+#include "../include/queues.h"
 
 /* Struct de controle Global */
 struct lib_control control = {.init = FALSE};
@@ -61,6 +62,50 @@ int cyield(void){
 
   return dispatcher();
 }
+
+
+/*
+ Parâmetros:
+   tid:    identificador da thread cujo término está sendo aguardado.
+ Retorno:
+   Se correto => 0 (zero)
+   Se erro    => Valor negativo. */
+int cjoin(int tid){
+  csem_t* block;
+  releaser_thread_control* releaser_thread;
+
+  /* Checa se as variáveis internas foram inicializadas */
+  if(control.init == FALSE)
+    if(init_lib())
+      return ERROR;
+
+  /* Testa se é um "autobloqueio" */
+  if (tid == control.running_thread->tid)
+    return ERROR;
+
+  /* Testa se tid se refere a uma thread existente*/
+  if (searchThread(control.all_threads, tid) == NULL)
+    return ERROR;
+
+  /* Testa se há outra thread esperando pela thread indicada por tid */
+  if (SearchReleaserThreadSemaphore(control.releaser_threads, tid) != NULL)
+    return ERROR;
+
+  /* Cria um semaforo para bloquear a running_thread */
+  block = (csem_t*) malloc(sizeof(csem_t));
+  csem_init(block, 0);
+
+  /* Cria um releaser thread control para armazenar os dados na fila de releaser_threads */
+  releaser_thread = (releaser_thread_control*) malloc(sizeof(releaser_thread_control));
+  releaser_thread->tid = tid;
+  releaser_thread->sem = block;
+
+  if (AppendFila2(control.releaser_threads, releaser_thread))
+    return ERROR;
+
+  return cwait(block);
+}
+
 
 /*
   Parâmetros:
