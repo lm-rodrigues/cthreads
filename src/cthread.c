@@ -252,7 +252,7 @@ inc csignal(csem_t* sem){
   // Remover a thread da fila do semáforo 
   // -> Não deve ocorrer erro pois erros de iterador invalido e
   // fila vazia já foram tratados anteriormente.
-  DeleteAtIteratorFila2(sem->fila, blocked_thread);
+  DeleteAtIteratorFila2(sem->fila);
 
   //mudar o estado da thread para apto
   if (blocked_thread->state == PROCST_BLOQ_SUS){
