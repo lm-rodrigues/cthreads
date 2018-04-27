@@ -19,9 +19,9 @@ BIN_DIR=./bin/
 SRC_DIR=./src/
 TST_DIR=./testes/
 
-all: $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)support.o
+all: $(BIN_DIR)cdata.o $(BIN_DIR)cthread.o $(BIN_DIR)support.o $(BIN_DIR)queues.o
 	$(LIB_MAKER) $(LIB_DIR)libcthread.a $(BIN_DIR)cdata.o \
-	$(BIN_DIR)cthread.o $(BIN_DIR)support.o
+	$(BIN_DIR)cthread.o $(BIN_DIR)support.o $(BIN_DIR)queues.o
 
 $(BIN_DIR)cdata.o: $(SRC_DIR)cdata.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)cdata.o -I$(INC_DIR) \
@@ -30,6 +30,11 @@ $(BIN_DIR)cdata.o: $(SRC_DIR)cdata.c
 $(BIN_DIR)cthread.o: $(SRC_DIR)cthread.c
 	$(CC) $(CFLAGS) -c -o $(BIN_DIR)cthread.o -I$(INC_DIR) \
 	$(SRC_DIR)cthread.c
+
+$(BIN_DIR)queues.o: $(SRC_DIR)queues.c
+	$(CC) $(CFLAGS) -c -o $(BIN_DIR)queues.o -I$(INC_DIR) \
+	$(SRC_DIR)queues.c
+
 
 # New link of support.o because it's removed in clean up process
 clean:

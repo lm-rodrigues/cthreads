@@ -85,7 +85,7 @@ TCB_t* searchThread(PFILA2 queue, int tid)
   /* Define o iterador no inicio da fila */
   FirstFila2(queue);
 
-  while (tr = GetAtIteratorFila2(queue))
+  while ((tr = GetAtIteratorFila2(queue)))
   {
     if (tr->tid == tid)
     {
