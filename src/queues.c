@@ -17,9 +17,9 @@ int DeleteFromFila2(PFILA2 fila, TCB_t *tcb){
     /* Verifica se achou o nodo a remover */
     if (tcb_aux->tid == tcb->tid) {
       if (DeleteAtIteratorFila2(fila))
-	return ERROR;
+	      return ERROR;
       else
-	return 0;
+	      return 0;
     }
     /* Move para o próximo iterador */
     else if (NextFila2(fila))

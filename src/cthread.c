@@ -79,7 +79,7 @@ int csuspend(int tid){
   TCB_t* tr;
 
   // Procurar a thread na lista all_threads
-  tr = search_thread(control.all_threads, tid)
+  tr = search_thread(control.all_threads, tid);
   if (tr == NULL){
     // Se a thread não existir, retornar ERROR
     return ERROR;
@@ -96,10 +96,11 @@ int csuspend(int tid){
   if (tr->state == PROCST_APTO){
     // Retirar a thread da fila de aptos e colocar no estado de apto-suspenso
     if (DeleteFromFila2(control.able, tr)){
-      // Tratar erro
+      return ERROR;
     }
     if (AppendFila2(control.able_suspended, (void*) tr)){
-      // Tratar erro;
+      AppendFila2(control.able, tr);
+      return ERROR;
     }
 
     tr->state = PROCST_APTO_SUS;
