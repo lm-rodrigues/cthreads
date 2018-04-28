@@ -5,17 +5,17 @@
 #include "../include/support.h"
 #include "../include/queues.h"
 
+FILA2 queue_all_threads;
+FILA2 queue_able;
+FILA2 queue_able_suspended;
+FILA2 queue_releaser_threds;
+
 /* Inicia variáveis de controle e cria a thread main
    Retorna 0 se conseguiu, e -1 caso contrário */
 int init_lib(void){
-  TCB_t* main_thread;
+  TCB_t* main_thread = NULL;
 
   /* Inicia o controle das filas */
-  FILA2 queue_all_threads;
-  FILA2 queue_able;
-  FILA2 queue_able_suspended;
-  FILA2 queue_releaser_threds;
-
   control.all_threads = &queue_all_threads;
   control.able = &queue_able;
   control.able_suspended = &queue_able_suspended;
@@ -23,8 +23,8 @@ int init_lib(void){
 
   /* Inicia as filas de controle e verifica se conseguiu
      Explora o comportamento de curto-circuito para melhor desempenho */
-  if ( CreateFila2(control.all_threads) && CreateFila2(control.able) &&
-       CreateFila2(control.able_suspended) && CreateFila2(control.releaser_threads)){
+  if ( CreateFila2(control.all_threads) || CreateFila2(control.able) ||
+       CreateFila2(control.able_suspended) || CreateFila2(control.releaser_threads)){
     return ERROR;
   }
 
@@ -39,7 +39,7 @@ int init_lib(void){
   main_thread->tid = 0;
 
   /* Insere thread principal em all_threads */
-  AppendFila2(control.all_threads, main_thread);
+  AppendFila2(control.all_threads, (void*)main_thread);
 
   /* Cria funções de finalização para as threads */
   getcontext(&control.ended_thread);

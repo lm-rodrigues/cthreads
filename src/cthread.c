@@ -7,7 +7,6 @@
 /* Struct de controle Global */
 struct lib_control control = {.init = FALSE};
 
-
 /*
  Parâmetros:
    start:  ponteiro para a função que a thread executará.
@@ -18,29 +17,29 @@ struct lib_control control = {.init = FALSE};
    Se erro    => Valor negativo. */
 int ccreate (void* (*start)(void*), void *arg, int prio){
   prio = 0;
-  TCB_t* new_thread;
+  TCB_t* new_thread = NULL;
 
   /* Checa se variáveis internas foram inicializadas */
   if(control.init == FALSE)
     if(init_lib())
       return ERROR;
-
+  
   /* Cria thread context */
   new_thread = (TCB_t*) malloc(sizeof(TCB_t));
-  getcontext(&new_thread->context);
+  getcontext(&new_thread->context);  
   new_thread->context.uc_stack.ss_sp = (char*) malloc(STACK_SIZE);
   new_thread->context.uc_stack.ss_size = STACK_SIZE;
   new_thread->context.uc_link = &control.ended_thread;
   makecontext(&new_thread->context, (void (*)(void))start, 1, arg);
-
+  
   /* Atribui a new_thread um TID e um estado inicial */
   control.last_created_tid++;
   new_thread->tid = control.last_created_tid;
   new_thread->state = PROCST_APTO;
-
+  
   /* Coloca a new_thread na fila de APTO*/
-  AppendFila2(control.all_threads, (void *) new_thread);
-  AppendFila2(control.able, (void *) new_thread);
+  AppendFila2(control.all_threads, (void*)new_thread);
+  AppendFila2(control.able, (void*)new_thread);  
 
   /* Returna o Thread Identifier (TID) */
   return new_thread->tid;
