@@ -10,6 +10,7 @@
 void* func(void *arg)
 {
   printf("thread ID0, imprimindo %d\n", *((int *)arg));
+  return;
 }
 
 int main()

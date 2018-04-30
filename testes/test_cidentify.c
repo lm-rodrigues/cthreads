@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "../include/cthread.h"
 
-#define LEN 95
+#define LEN 102
 
 int main()
 {
