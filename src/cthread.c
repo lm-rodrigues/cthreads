@@ -188,10 +188,11 @@ int cresume(int tid){
   if (tr->state == PROCST_APTO_SUS){
     //retirar a thread da fila de aptos-supensos e colocar no estado de apto.
     if (DeleteFromFila2(control.able_suspended, tr)){
-      // Tratar erro
+      return ERROR;
     }
     if (AppendFila2(control.able, (void*) tr)){
-      // Tratar erro;
+      AppendFila2(control.able_suspended, tr);
+      return ERROR;
     }
 
     tr->state = PROCST_APTO;
