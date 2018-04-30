@@ -16,10 +16,10 @@ As funcionalidades implementadas na api são:
 
 - [x] ccreate;
 - [x] cyield;
-- [ ] cjoin;
-- [ ] csuspend;
-- [ ] cresume;
-- [ ] csem_init;
-- [ ] cwait;
-- [ ] csignal;
+- [x] cjoin;
+- [x] csuspend;
+- [x] cresume;
+- [x] csem_init;
+- [x] cwait;
+- [x] csignal;
 - [x] cidentify;
